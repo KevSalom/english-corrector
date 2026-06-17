@@ -8,7 +8,7 @@ function App() {
       <header className="app-header">
         <div className="header-content">
           <div className="app-title">
-            <span>🇬🇧</span>
+            <span>🇺🇸</span>
             <span>EnglishCorrector</span>
           </div>
           <ThemeToggle />
