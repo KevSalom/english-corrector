@@ -41,6 +41,7 @@ class OpenRouterRepository:
                         "strict": True
                     }
                 },
+                max_tokens=1000,  # Prevent response truncation
                 extra_headers={
                     "HTTP-Referer": "https://github.com/kevin/english-corrector",
                     "X-Title": "English Corrector App",
@@ -51,8 +52,18 @@ class OpenRouterRepository:
             if not response_content:
                 raise ValueError("Received empty response from OpenRouter.")
             
+            # Clean up potential markdown wrappers
+            cleaned_content = response_content.strip()
+            if cleaned_content.startswith("```json"):
+                cleaned_content = cleaned_content[7:]
+            elif cleaned_content.startswith("```"):
+                cleaned_content = cleaned_content[3:]
+            if cleaned_content.endswith("```"):
+                cleaned_content = cleaned_content[:-3]
+            cleaned_content = cleaned_content.strip()
+            
             # Parse the response to ensure it matches the schema
-            data = json.loads(response_content)
+            data = json.loads(cleaned_content)
             
             # Pydantic validation
             validated_response = CorrectionResponse(**data)
