@@ -41,6 +41,7 @@ class OpenRouterRepository:
                         "strict": True
                     }
                 },
+                temperature=0,  # Low temperature for more deterministic output
                 max_tokens=1000,  # Prevent response truncation
                 extra_headers={
                     "HTTP-Referer": "https://github.com/kevin/english-corrector",
