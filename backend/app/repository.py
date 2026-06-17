@@ -3,7 +3,14 @@ import logging
 from openai import OpenAI
 from app.config import settings
 from app.schemas import CorrectionResponse
-from app.prompts import SYSTEM_CORRECTOR_PROMPT
+from app.prompts import (
+    SYSTEM_CORRECTOR_PROMPT,
+    SCHEMA_TEMPLATE,
+    FEW_SHOT_USER_1,
+    FEW_SHOT_ASSISTANT_1,
+    FEW_SHOT_USER_2,
+    FEW_SHOT_ASSISTANT_2
+)
 
 logger = logging.getLogger(__name__)
 
@@ -26,12 +33,19 @@ class OpenRouterRepository:
             
             logger.info(f"Sending request to OpenRouter using model: {self.model}")
             
+            # Construct messages using few-shot history for perfect schema enforcement
+            messages = [
+                {"role": "system", "content": SYSTEM_CORRECTOR_PROMPT + "\n" + SCHEMA_TEMPLATE},
+                {"role": "user", "content": FEW_SHOT_USER_1},
+                {"role": "assistant", "content": json.dumps(FEW_SHOT_ASSISTANT_1)},
+                {"role": "user", "content": FEW_SHOT_USER_2},
+                {"role": "assistant", "content": json.dumps(FEW_SHOT_ASSISTANT_2)},
+                {"role": "user", "content": text}
+            ]
+            
             response = self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "system", "content": SYSTEM_CORRECTOR_PROMPT},
-                    {"role": "user", "content": text}
-                ],
+                messages=messages,
                 # OpenRouter supports structured output JSON Schema
                 response_format={
                     "type": "json_schema",
@@ -41,8 +55,8 @@ class OpenRouterRepository:
                         "strict": True
                     }
                 },
-                temperature=0,  # Low temperature for more deterministic output
                 max_tokens=1000,  # Prevent response truncation
+                temperature=0.0,  # Force deterministic, consistent output
                 extra_headers={
                     "HTTP-Referer": "https://github.com/kevin/english-corrector",
                     "X-Title": "English Corrector App",
