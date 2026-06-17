@@ -14,20 +14,12 @@ from app.prompts import SYSTEM_CORRECTOR_PROMPT
 import openai
 from openai import OpenAI
 
-# 12 Models to benchmark
+# The 4 winning models from the previous benchmark
 MODELS = [
-    "deepseek/deepseek-v4-flash",
-    "stepfun/step-3.5-flash",
-    "xiaomi/mimo-v2-flash",
     "google/gemini-2.5-flash-lite",
-    "google/gemini-2.5-flash",
-    "z-ai/glm-4.7-flash",
-    "google/gemini-3.1-flash-lite",
-    "bytedance-seed/seed-1.6-flash",
-    "rekaai/reka-flash-3",
-    "qwen/qwen3.5-flash-02-23",
-    "qwen/qwen3.6-flash",
-    "inclusionai/ling-2.6-flash"
+    "inclusionai/ling-2.6-flash",
+    "xiaomi/mimo-v2-flash",
+    "google/gemini-3.1-flash-lite"
 ]
 
 # 10 Test sentences representing different error types and perfect sentences
@@ -62,9 +54,48 @@ Deberás responder estrictamente con un objeto JSON que siga esta estructura:
 }
 """
 
+# Few-shot Example 1: Sentence with errors
+FEW_SHOT_USER_1 = "I am agree with you, but she don't write very good."
+FEW_SHOT_ASSISTANT_1 = {
+  "original_text": "I am agree with you, but she don't write very good.",
+  "corrected_text": "I agree with you, but she doesn't write very well.",
+  "has_corrections": True,
+  "corrections": [
+    {
+      "original": "am agree",
+      "corrected": "agree",
+      "explanation": "En inglés, 'agree' es un verbo y no requiere el verbo auxiliar 'am'. Decimos 'I agree' directamente.",
+      "category": "grammar"
+    },
+    {
+      "original": "don't",
+      "corrected": "doesn't",
+      "explanation": "Con la tercera persona del singular (she, he, it) en presente simple, el auxiliar negativo correcto es 'doesn't'.",
+      "category": "grammar"
+    },
+    {
+      "original": "good",
+      "corrected": "well",
+      "explanation": "Para describir cómo se realiza una acción (escribir), se utiliza el adverbio 'well' en lugar del adjetivo 'good'.",
+      "category": "style"
+    }
+  ],
+  "general_feedback": "¡Buen intento! Tu frase se entiende bien, pero recuerda conjugar correctamente el auxiliar para la tercera persona singular (she doesn't) y usar 'well' como adverbio para calificar acciones. Sigue practicando."
+}
+
+# Few-shot Example 2: Perfect sentence
+FEW_SHOT_USER_2 = "She has been working as a software engineer for five years."
+FEW_SHOT_ASSISTANT_2 = {
+  "original_text": "She has been working as a software engineer for five years.",
+  "corrected_text": "She has been working as a software engineer for five years.",
+  "has_corrections": False,
+  "corrections": [],
+  "general_feedback": "¡Excelente! Tu oración es gramaticalmente correcta y suena muy natural. ¡Buen trabajo!"
+}
+
 def run_benchmark():
     print("====================================================", flush=True)
-    print("        BENCHMARK DE MODELOS FLASH EN OPENROUTER     ", flush=True)
+    print(" BENCHMARK MIXTO: SCHEMA ESTRICTO + FEW-SHOT + TEMP=0", flush=True)
     print("====================================================", flush=True)
     
     api_key = os.getenv("OPENROUTER_API_KEY") or settings.openrouter_api_key
@@ -77,35 +108,50 @@ def run_benchmark():
         api_key=api_key
     )
     
+    schema = CorrectionResponse.model_json_schema()
     results = {}
 
     for model in MODELS:
-        print(f"\nProbando modelo: {model} ...", flush=True)
+        print(f"\nProbando modelo mixto: {model} ...", flush=True)
         latencies = []
         success_count = 0
         correctly_null = 0 
         json_parse_errors = 0
         validation_errors = 0
         timeout_errors = 0
-        other_errors = 0
         
         for idx, sentence in enumerate(TEST_SENTENCES, 1):
             time.sleep(0.5)
             start_time = time.time()
             try:
-                # We use response_format={"type": "json_object"} which is universally supported
+                # Construct messages using few-shot history
+                messages = [
+                    {"role": "system", "content": SYSTEM_CORRECTOR_PROMPT + "\n" + SCHEMA_TEMPLATE},
+                    {"role": "user", "content": FEW_SHOT_USER_1},
+                    {"role": "assistant", "content": json.dumps(FEW_SHOT_ASSISTANT_1)},
+                    {"role": "user", "content": FEW_SHOT_USER_2},
+                    {"role": "assistant", "content": json.dumps(FEW_SHOT_ASSISTANT_2)},
+                    {"role": "user", "content": sentence}
+                ]
+                
+                # Using json_schema format WITH strict validation AND few-shot history
                 response = client.chat.completions.create(
                     model=model,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_CORRECTOR_PROMPT + "\n" + SCHEMA_TEMPLATE},
-                        {"role": "user", "content": sentence}
-                    ],
-                    response_format={"type": "json_object"},
+                    messages=messages,
+                    response_format={
+                        "type": "json_schema",
+                        "json_schema": {
+                            "name": "CorrectionResponse",
+                            "schema": schema,
+                            "strict": True
+                        }
+                    },
                     max_tokens=1000,
+                    temperature=0.0,
                     timeout=15.0,  # 15 seconds timeout
                     extra_headers={
                         "HTTP-Referer": "https://github.com/kevin/english-corrector",
-                        "X-Title": "Benchmark English Corrector",
+                        "X-Title": "Benchmark Mixto Schema Few Shot",
                     }
                 )
                 latency = time.time() - start_time
@@ -115,7 +161,6 @@ def run_benchmark():
                 if not content:
                     raise ValueError("Content empty")
                 
-                # Clean up potential markdown wrappers
                 cleaned = content.strip()
                 if cleaned.startswith("```json"):
                     cleaned = cleaned[7:]
@@ -137,14 +182,13 @@ def run_benchmark():
                 
             except openai.APITimeoutError:
                 timeout_errors += 1
-                print(f"  [Sentence {idx}] Timeout error (took > 15s)", flush=True)
+                print(f"  [Sentence {idx}] Timeout (took > 15s)", flush=True)
             except json.JSONDecodeError:
                 json_parse_errors += 1
                 print(f"  [Sentence {idx}] JSON Decode error", flush=True)
             except Exception as e:
-                # Catch validation or mapping errors
                 validation_errors += 1
-                print(f"  [Sentence {idx}] Validation/Schema error: {str(e)[:50]}...", flush=True)
+                print(f"  [Sentence {idx}] Schema/Validation error: {str(e)[:50]}...", flush=True)
                 
         avg_latency = sum(latencies) / len(latencies) if latencies else 0
         min_latency = min(latencies) if latencies else 0
@@ -158,14 +202,13 @@ def run_benchmark():
             "perfect_accuracy": f"{correctly_null}/2",
             "json_errors": json_parse_errors,
             "validation_errors": validation_errors,
-            "timeout_errors": timeout_errors,
-            "other_errors": other_errors
+            "timeout_errors": timeout_errors
         }
         
         print(f"  -> Resultados para {model}: Latencia Promedio: {avg_latency:.2f}s | Éxito: {success_count}/10 | Errores JSON/Schema: {json_parse_errors + validation_errors} | Timeouts: {timeout_errors}", flush=True)
 
     print("\n\n====================================================", flush=True)
-    print("               INFORME DE BENCHMARK                 ", flush=True)
+    print("      INFORME DE BENCHMARK MIXTO (SCHEMA + FEW-SHOT)  ", flush=True)
     print("====================================================", flush=True)
     
     print("| Modelo | Latencia Promedio (s) | Rango Latencia (s) | Tasa de Éxito (JSON) | Precisión Sentencias Perfectas | Timeouts |", flush=True)
@@ -173,8 +216,6 @@ def run_benchmark():
     
     for model, stats in results.items():
         print(f"| {model} | {stats['avg_latency']:.2f}s | {stats['min_latency']:.2f}s - {stats['max_latency']:.2f}s | {stats['success_rate']} | {stats['perfect_accuracy']} | {stats['timeout_errors']} |", flush=True)
-        
-    print("\nNota: La precisión de Sentencias Perfectas mide si el modelo reconoció correctamente las 2 oraciones perfectas sin inventar errores (has_corrections=False).", flush=True)
 
 if __name__ == "__main__":
     run_benchmark()

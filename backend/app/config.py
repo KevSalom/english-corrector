@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     openrouter_api_key: str = ""
-    openrouter_model: str = "xiaomi/mimo-v2-flash"
+    openrouter_model: str = "google/gemini-2.5-flash-lite"
     host: str = "127.0.0.1"
     port: int = 8000
 

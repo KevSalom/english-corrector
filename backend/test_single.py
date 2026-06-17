@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import traceback
 from dotenv import load_dotenv
 
 # Add app directory to path
@@ -10,24 +11,6 @@ load_dotenv()
 from openai import OpenAI
 from app.schemas import CorrectionResponse
 from app.prompts import SYSTEM_CORRECTOR_PROMPT
-
-SCHEMA_TEMPLATE = """
-Deberás responder estrictamente con un objeto JSON que siga esta estructura:
-{
-  "original_text": "texto original en inglés",
-  "corrected_text": "texto corregido en inglés",
-  "has_corrections": true o false,
-  "corrections": [
-    {
-      "original": "palabra o frase errónea",
-      "corrected": "palabra o frase corregida",
-      "explanation": "explicación de la regla en español",
-      "category": "grammar" o "spelling" o "punctuation" o "style"
-    }
-  ],
-  "general_feedback": "consejo general en español"
-}
-"""
 
 def test_single():
     api_key = os.getenv("OPENROUTER_API_KEY")
@@ -40,29 +23,34 @@ def test_single():
         api_key=api_key
     )
     
-    model = "deepseek/deepseek-v4-flash"
+    schema = CorrectionResponse.model_json_schema()
+    model = "inclusionai/ling-2.6-flash"
     sentence = "I am agree with your opinion, but my brother don't think so."
     
-    print(f"Testing JSON Mode with prompt template on: {model}")
-    start = time.time()
+    print(f"Testing strict schema request to: {model}")
     try:
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": SYSTEM_CORRECTOR_PROMPT + "\n" + SCHEMA_TEMPLATE},
+                {"role": "system", "content": SYSTEM_CORRECTOR_PROMPT},
                 {"role": "user", "content": sentence}
             ],
-            response_format={"type": "json_object"},
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "CorrectionResponse",
+                    "schema": schema,
+                    "strict": True
+                }
+            },
             max_tokens=1000,
             timeout=15.0
         )
-        latency = time.time() - start
-        print(f"SUCCESS: Took {latency:.2f}s")
-        print("Response:", response.choices[0].message.content)
+        print("SUCCESS")
     except Exception as e:
-        latency = time.time() - start
-        print(f"FAILED: Took {latency:.2f}s")
-        print("Error details:", type(e).__name__, str(e))
+        print("FAILED")
+        print("\n--- TRACEBACK ---")
+        traceback.print_exc()
 
 if __name__ == "__main__":
     test_single()
