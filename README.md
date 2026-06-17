@@ -1,4 +1,4 @@
-# 🇬🇧 EnglishCorrector - Corrector de Inglés Inteligente con Explicaciones en Español
+# 🇺🇸 EnglishCorrector - Corrector de Inglés Inteligente con Explicaciones en Español
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
