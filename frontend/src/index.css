@@ -682,3 +682,16 @@ button {
 .spinner path {
   opacity: 0.75;
 }
+
+/* Speaker speaking glow effect */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
+}
+
+.btn-icon.speaking {
+  background-color: var(--color-brand-light);
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+  animation: pulse-glow 1.5s infinite;
+}

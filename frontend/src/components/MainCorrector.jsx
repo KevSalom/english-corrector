@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Copy, Check, RotateCcw, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Copy, Check, RotateCcw, AlertTriangle, Info, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
 import CorrectionCard from './CorrectionCard';
 
 export default function MainCorrector() {
@@ -8,6 +8,48 @@ export default function MainCorrector() {
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+
+  // SpeechSynthesis voice controller
+  const handleSpeak = () => {
+    if ('speechSynthesis' in window) {
+      if (speaking) {
+        window.speechSynthesis.cancel();
+        setSpeaking(false);
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(result.corrected_text);
+      utterance.lang = 'en-US';
+      
+      // Try to load voices
+      const voices = window.speechSynthesis.getVoices();
+      const usVoice = voices.find(v => v.lang === 'en-US' && v.name.toLowerCase().includes('google')) 
+                   || voices.find(v => v.lang === 'en-US' && v.name.toLowerCase().includes('natural'))
+                   || voices.find(v => v.lang === 'en-US');
+      
+      if (usVoice) {
+        utterance.voice = usVoice;
+      }
+
+      utterance.onend = () => setSpeaking(false);
+      utterance.onerror = () => setSpeaking(false);
+
+      setSpeaking(true);
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Tu navegador no soporta la síntesis de voz nativa.');
+    }
+  };
+
+  // Cancel speaking if result changes or component unmounts
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [result]);
 
   // Load last session on mount
   useEffect(() => {
@@ -239,13 +281,24 @@ export default function MainCorrector() {
                   Texto Corregido
                 </h3>
                 
-                <button
-                  onClick={copyToClipboard}
-                  className="btn-icon"
-                  title="Copiar texto corregido"
-                >
-                  {copied ? <Check className="w-4 h-4 text-[var(--color-success)]" /> : <Copy className="w-4 h-4" />}
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={handleSpeak}
+                    className={`btn-icon ${speaking ? 'speaking' : ''}`}
+                    title={speaking ? "Detener pronunciación" : "Escuchar pronunciación (US)"}
+                  >
+                    {speaking ? <VolumeX className="w-4 h-4 text-[var(--color-brand)]" /> : <Volume2 className="w-4 h-4" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={copyToClipboard}
+                    className="btn-icon"
+                    title="Copiar texto corregido"
+                  >
+                    {copied ? <Check className="w-4 h-4 text-[var(--color-success)]" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
               <p className="comparison-text">
                 {result.has_corrections
