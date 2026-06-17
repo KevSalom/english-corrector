@@ -16,9 +16,7 @@ from openai import OpenAI
 
 # The 4 winning models from the previous benchmark
 MODELS = [
-    "google/gemini-2.5-flash-lite",
     "inclusionai/ling-2.6-flash",
-    "xiaomi/mimo-v2-flash",
     "google/gemini-3.1-flash-lite"
 ]
 
