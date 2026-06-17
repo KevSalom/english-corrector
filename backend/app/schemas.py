@@ -1,0 +1,25 @@
+from pydantic import BaseModel, Field
+from typing import List, Literal
+
+class CorrectionItem(BaseModel):
+    original: str = Field(description="The incorrect word or phrase from the user's sentence.")
+    corrected: str = Field(description="The corrected word or phrase.")
+    explanation: str = Field(description="A clear and simple explanation in Spanish detailing why the change was made and the grammar rule applied.")
+    category: Literal["grammar", "spelling", "punctuation", "style"] = Field(
+        description="The category of the mistake: 'grammar' for syntax errors, 'spelling' for typos, 'punctuation' for comma/period issues, 'style' for phrasing/naturalness."
+    )
+
+class CorrectionResponse(BaseModel):
+    original_text: str = Field(description="The original English sentence sent by the user.")
+    corrected_text: str = Field(description="The fully corrected and natural English sentence.")
+    has_corrections: bool = Field(description="Boolean indicating whether any corrections or improvements were made.")
+    corrections: List[CorrectionItem] = Field(
+        default=[],
+        description="A list of specific corrections made. Empty if has_corrections is false."
+    )
+    general_feedback: str = Field(
+        description="A encouraging and helpful overview in Spanish of the user's grammar, mentioning what they did well and general areas of improvement."
+    )
+
+class CorrectionRequest(BaseModel):
+    text: str = Field(..., max_length=1000, description="The English sentence or short paragraph to correct.")
