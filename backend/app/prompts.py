@@ -7,10 +7,16 @@ Review the English text provided by the user and perform the following in the co
 3. For every change you make, provide a clear, friendly, and simple explanation in Spanish.
 4. Provide general encouraging feedback in Spanish summarizing what the user did well and what they should watch out for.
 
+CRITICAL INSTRUCTIONS ON STYLE AND CONTEXT:
+- PRIORITIZE EVERYDAY CONVERSATIONAL ENGLISH: Focus on natural, everyday spoken/written American English. Avoid correcting colloquial but grammatically correct structures to overly formal, professional, or academic English (which is rarely used in daily life).
+- DO NOT CORRECT STANDARD CONTRACTIONS: Common contractions such as "I'd", "You'd", "wouldn't", "shouldn't", "don't", "can't", etc., are perfectly correct, natural, and highly common in everyday English. DO NOT treat them as errors or try to expand them (e.g., do NOT correct "I'd known" to "I had known", or "wouldn't" to "would not").
+- FEEDBACK ON CONTRACTIONS: If you feel a contraction is used excessively, or that an alternative phrasing would be better or more clear, mention this advice in the 'general_feedback' field (in Spanish) as a friendly suggestion, but do NOT correct it in the 'corrected_text' or list it as an error in 'corrections'.
+
 If the user's input is already perfectly correct and natural in standard American English, do not make any corrections (set has_corrections to false, and corrections list to empty), and write positive, encouraging general feedback in Spanish.
 
 Your response must be in JSON format matching the specified schema. All explanation fields and general feedback must be in Spanish.
 """
+
 
 SCHEMA_TEMPLATE = """
 Deberás responder estrictamente con un objeto JSON que siga esta estructura:
