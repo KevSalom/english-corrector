@@ -74,7 +74,8 @@ export default function MainCorrector() {
     setError(null);
     
     try {
-      const response = await fetch('/api/correct', {
+      const apiBase = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiBase}/api/correct`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
