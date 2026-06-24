@@ -225,35 +225,38 @@ export default function VideoPracticer() {
     .filter(seg => seg.text.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="corrector-container animate-fade-in">
-      <div className="corrector-header">
-        <h1 className="title-gradient">Práctica de Comprensión con Vídeo</h1>
-        <p className="subtitle">
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-6">
+      
+      {/* Header Section */}
+      <div className="text-center sm:text-left">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">
+          Práctica de Comprensión con Vídeo
+        </h1>
+        <p className="text-text-secondary text-sm sm:text-base mt-2">
           Sigue la transcripción de videos en tiempo real y haz clic para escuchar.
         </p>
       </div>
 
       {/* URL Input Card */}
-      <form onSubmit={handleFetchTranscript} className="corrector-card" style={{ marginBottom: '2rem' }}>
-        <div className="input-meta">
-          <label htmlFor="youtube-url-input" className="input-label">
+      <form onSubmit={handleFetchTranscript} className="p-5 sm:p-6 rounded-2xl bg-surface border border-border-custom shadow-sm flex flex-col gap-4">
+        <div className="text-xs font-semibold text-text-secondary tracking-wider uppercase">
+          <label htmlFor="youtube-url-input">
             Enlace de video de YouTube
           </label>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', width: '100%' }} className="search-input-wrapper">
-          <div style={{ position: 'relative', flex: 1 }}>
+        <div className="flex flex-col sm:flex-row gap-3 w-full">
+          <div className="relative flex-grow">
             <YoutubeIcon 
-              className="absolute-icon" 
               style={{
                 position: 'absolute',
                 left: '12px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: 'var(--color-text-muted)',
                 width: '18px',
                 height: '18px'
-              }} 
+              }}
+              className="text-text-muted"
             />
             <input
               id="youtube-url-input"
@@ -261,27 +264,19 @@ export default function VideoPracticer() {
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
               placeholder="Pega la URL de YouTube aquí (ej. https://www.youtube.com/watch?v=...)"
-              className="corrector-textarea"
-              style={{
-                height: '46px',
-                padding: '10px 12px 10px 42px',
-                resize: 'none',
-                lineHeight: '26px',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap'
-              }}
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-border-custom bg-app text-text-primary text-sm sm:text-base focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all outline-none"
               disabled={loading}
             />
           </div>
+          
           <button
             type="submit"
             disabled={loading || !videoUrl.trim()}
-            className="btn-primary"
-            style={{ padding: '0 1.5rem', height: '46px', whiteSpace: 'nowrap' }}
+            className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand hover:bg-brand-hover text-white font-semibold shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
           >
             {loading ? (
               <>
-                <svg className="spinner" fill="none" viewBox="0 0 24 24" style={{ marginRight: '8px' }}>
+                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
@@ -297,16 +292,17 @@ export default function VideoPracticer() {
         </div>
       </form>
 
+      {/* Error Alert */}
       {error && (
-        <div className="error-alert animate-fade-in" style={{ marginBottom: '2rem' }}>
-          <AlertCircle className="w-5 h-5 shrink-0" />
+        <div className="flex items-start gap-3 p-4 rounded-xl border border-error-custom/20 bg-error-light-custom/30 text-error-custom text-sm">
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <div>{error}</div>
         </div>
       )}
 
       {/* Main Workspace (Full Width Vertical View) */}
       {transcript.length > 0 && (
-        <div className="video-workspace-vertical animate-fade-in">
+        <div className="flex flex-col gap-6">
           
           {/* Top panel: Player */}
           <div className="video-player-card">
