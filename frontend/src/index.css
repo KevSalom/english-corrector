@@ -695,3 +695,168 @@ button {
   border-color: var(--color-brand);
   animation: pulse-glow 1.5s infinite;
 }
+
+/* Navigation & Title Group styling */
+.app-title-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.header-nav {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.nav-link {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.nav-link.active {
+  color: var(--color-brand);
+  background-color: var(--color-brand-light);
+  font-weight: 600;
+}
+
+/* Video Practice Workspace styling */
+.video-workspace-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.video-player-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  padding: 0;
+  width: 100%;
+}
+
+.video-ratio-box {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+}
+
+.video-ratio-box iframe,
+.video-ratio-box #youtube-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Transcript styling */
+.transcript-card.full-width {
+  width: 100%;
+  background-color: #881337; /* Strong crimson/burgundy background (Spotify style) */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: fit-content;
+}
+
+.transcript-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: #700f2b; /* Slightly darker burgundy for header */
+}
+
+/* Ensure text in header is white */
+.transcript-header-bar .card-title {
+  color: #ffffff !important;
+}
+
+/* Search input styling to fit inside the dark red card */
+.transcript-header-bar input {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.transcript-header-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.concatenated-transcript {
+  padding: 2.5rem 1.5rem;
+  overflow-y: auto;
+  max-height: 250px;
+  line-height: 2;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: left;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 25%,
+    black 75%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 25%,
+    black 75%,
+    transparent 100%
+  );
+}
+
+.transcript-word-span {
+  display: inline;
+  padding: 0.15rem 0.35rem;
+  margin: 0 0.05rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.55); /* Dark/black text for unspoken words */
+  transition: all 0.15s ease;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.transcript-word-span:hover {
+  color: #ffffff; /* Turns white on hover */
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.transcript-word-span.active {
+  color: #ffffff; /* White text for spoken words */
+  background-color: transparent;
+}
+
+@media (max-width: 767px) {
+  .app-title-nav-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+

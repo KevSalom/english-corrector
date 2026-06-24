@@ -23,3 +23,16 @@ class CorrectionResponse(BaseModel):
 
 class CorrectionRequest(BaseModel):
     text: str = Field(..., max_length=1000, description="The English sentence or short paragraph to correct.")
+
+class TranscriptRequest(BaseModel):
+    url: str = Field(..., description="The YouTube video URL (standard, shorts, embed, or youtu.be).")
+
+class TranscriptSegment(BaseModel):
+    text: str = Field(..., description="The subtitle text snippet.")
+    start: float = Field(..., description="Start time in seconds.")
+    duration: float = Field(..., description="Duration in seconds.")
+
+class TranscriptResponse(BaseModel):
+    video_id: str = Field(..., description="The extracted 11-character YouTube video ID.")
+    segments: List[TranscriptSegment] = Field(..., description="The list of timed transcript segments.")
+
