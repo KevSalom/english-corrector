@@ -305,55 +305,46 @@ export default function VideoPracticer() {
         <div className="flex flex-col gap-6">
           
           {/* Top panel: Player */}
-          <div className="video-player-card">
-            <div className="video-ratio-box">
-              <div id="youtube-player"></div>
+          <div className="w-full border border-border-custom rounded-2xl overflow-hidden shadow-md bg-surface">
+            <div className="relative w-full pt-[56.25%] [&>iframe]:absolute [&>iframe]:top-0 [&>iframe]:left-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0">
+              <div id="youtube-player" className="absolute top-0 left-0 w-full h-full border-0"></div>
             </div>
           </div>
 
 
           {/* Bottom panel: Transcript */}
-          <div className="transcript-card full-width">
-            <div className="transcript-header-bar">
-              <h3 className="card-title corrected" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Clock size={18} />
+          {/* Bottom panel: Transcript */}
+          <div className="w-full bg-brand border border-brand/20 rounded-2xl shadow-md flex flex-col overflow-hidden h-fit">
+            <div className="flex justify-between items-center py-5 px-6 border-b border-brand/10 bg-brand-hover">
+              <h3 className="text-white font-bold flex items-center gap-2 m-0 text-sm sm:text-base">
+                <Clock className="w-4.5 h-4.5" />
                 <span>Transcripción Sincronizada</span>
               </h3>
               
               {/* Word search filter */}
-              <div style={{ position: 'relative', width: '200px' }}>
+              <div className="relative w-48 sm:w-60">
                 <Search
-                  style={{
-                    position: 'absolute',
-                    left: '8px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--color-text-muted)',
-                    width: '14px',
-                    height: '14px'
-                  }}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/60 w-3.5 h-3.5"
                 />
                 <input
                   type="text"
                   placeholder="Buscar palabra..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{
-                    width: '100%',
-                    height: '32px',
-                    padding: '4px 8px 4px 28px',
-                    fontSize: '0.875rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--color-border)',
-                    backgroundColor: 'var(--color-bg)',
-                    color: 'var(--color-text)'
-                  }}
+                  className="w-full bg-white/10 text-white placeholder-white/50 border border-white/20 pl-9 pr-3 py-1.5 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all"
                 />
               </div>
             </div>
 
             {/* Scrollable Concatenated Container */}
-            <div id="transcript-container" className="concatenated-transcript">
+            <div 
+              id="transcript-container" 
+              className="overflow-y-auto pt-10 px-6 pb-40 max-h-[320px] leading-[2] text-[1.55rem] font-semibold text-left select-none"
+              style={{
+                maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)'
+              }}
+            >
               {filteredTranscript.length > 0 ? (
                 filteredTranscript.map((seg) => {
                   const isActive = seg.originalIndex <= activeIndex + 1;
@@ -362,14 +353,18 @@ export default function VideoPracticer() {
                       key={seg.originalIndex}
                       id={`seg-line-${seg.originalIndex}`}
                       onClick={() => handleSeek(seg.start)}
-                      className={`transcript-word-span ${isActive ? 'active' : ''}`}
+                      className={`inline cursor-pointer transition-all duration-150 ${
+                        isActive 
+                          ? 'text-white font-bold' 
+                          : 'text-black/60 hover:text-white hover:underline'
+                      }`}
                     >
                       {seg.text}{' '}
                     </span>
                   );
                 })
               ) : (
-                <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                <div className="h-full flex items-center justify-center text-white/70 text-sm py-12">
                   {searchQuery ? 'No se encontraron fragmentos con esa palabra.' : 'Cargando transcripción...'}
                 </div>
               )}
