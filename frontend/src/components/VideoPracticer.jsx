@@ -14,7 +14,9 @@ const YoutubeIcon = (props) => (
 );
 
 export default function VideoPracticer() {
-  const [videoUrl, setVideoUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState(() => {
+    return localStorage.getItem('lastVideoUrl') || '';
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [videoId, setVideoId] = useState(null);
@@ -195,6 +197,7 @@ export default function VideoPracticer() {
 
       setVideoId(data.video_id);
       setTranscript(data.segments);
+      localStorage.setItem('lastVideoUrl', videoUrl);
     } catch (err) {
       console.error(err);
       setError(err.message || 'Error de conexión con el servidor backend.');
@@ -224,9 +227,9 @@ export default function VideoPracticer() {
   return (
     <div className="corrector-container animate-fade-in">
       <div className="corrector-header">
-        <h1 className="title-gradient">Práctica de Comprensión con Video</h1>
+        <h1 className="title-gradient">Práctica de Comprensión con Vídeo</h1>
         <p className="subtitle">
-          Incrusta un video de YouTube en inglés para ver y seguir la transcripción en tiempo real. ¡Haz clic en las oraciones para saltar al fragmento de audio!
+          Sigue la transcripción de videos en tiempo real y haz clic para escuchar.
         </p>
       </div>
 

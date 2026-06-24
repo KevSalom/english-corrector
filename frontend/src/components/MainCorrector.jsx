@@ -190,10 +190,10 @@ export default function MainCorrector() {
     <div className="corrector-container animate-fade-in">
       <div className="corrector-header">
         <h1 className="title-gradient">
-          Práctica de Escritura con Feedback Inmediato
+          Práctica de Escritura
         </h1>
         <p className="subtitle">
-          Escribe tu texto en inglés y obtén correcciones detalladas con explicaciones en español al instante.
+          Escribe en inglés y recibe correcciones detalladas al instante.
         </p>
       </div>
 

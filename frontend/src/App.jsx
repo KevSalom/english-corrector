@@ -1,50 +1,54 @@
-import React, { useState } from 'react';
-import MainCorrector from './components/MainCorrector';
-import VideoPracticer from './components/VideoPracticer';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import CorrectorPage from './pages/CorrectorPage';
+import VideoPage from './pages/VideoPage';
 import ThemeToggle from './components/ThemeToggle';
 
 function App() {
-  const [activeView, setActiveView] = useState('corrector');
-
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <div className="header-content">
-          <div className="app-title-nav-group">
-            <div className="app-title" onClick={() => setActiveView('corrector')} style={{ cursor: 'pointer' }}>
-              <span>🇺🇸</span>
-              <span>Inglés al Grano</span>
+    <Router>
+      <div className="app-container">
+        <header className="app-header">
+          <div className="header-content">
+            <div className="app-title-nav-group">
+              <NavLink to="/" className="app-title" style={{ textDecoration: 'none' }}>
+                <span>🇺🇸</span>
+                <span>Inglés al Grano</span>
+              </NavLink>
+              
+              <nav className="header-nav">
+                <NavLink 
+                  to="/" 
+                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  end
+                >
+                  Corrector de Escritura
+                </NavLink>
+                <NavLink 
+                  to="/video" 
+                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                >
+                  Práctica con Video
+                </NavLink>
+              </nav>
             </div>
             
-            <nav className="header-nav">
-              <button 
-                className={`nav-link ${activeView === 'corrector' ? 'active' : ''}`}
-                onClick={() => setActiveView('corrector')}
-              >
-                Corrector de Escritura
-              </button>
-              <button 
-                className={`nav-link ${activeView === 'video' ? 'active' : ''}`}
-                onClick={() => setActiveView('video')}
-              >
-                Práctica con Video
-              </button>
-            </nav>
+            <ThemeToggle />
           </div>
-          
-          <ThemeToggle />
-        </div>
-      </header>
+        </header>
 
-      <main className="main-content">
-        {activeView === 'corrector' ? <MainCorrector /> : <VideoPracticer />}
-      </main>
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<CorrectorPage />} />
+            <Route path="/video" element={<VideoPage />} />
+          </Routes>
+        </main>
 
-
-      <footer className="app-footer">
-        <p>© {new Date().getFullYear()} Inglés al Grano. Tu compañero inteligente para mejorar tu inglés.</p>
-      </footer>
-    </div>
+        <footer className="app-footer">
+          <p>© {new Date().getFullYear()} Inglés al Grano. Tu compañero inteligente para mejorar tu inglés.</p>
+        </footer>
+      </div>
+    </Router>
   );
 }
 
