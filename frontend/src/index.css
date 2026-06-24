@@ -806,9 +806,9 @@ button {
 }
 
 .concatenated-transcript {
-  padding: 2.5rem 1.5rem;
+  padding: 2.5rem 1.5rem 10rem 1.5rem;
   overflow-y: auto;
-  max-height: 250px;
+  max-height: 320px;
   line-height: 2;
   font-size: 1.2rem;
   font-weight: 600;
