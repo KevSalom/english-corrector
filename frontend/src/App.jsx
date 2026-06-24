@@ -13,7 +13,7 @@ function App() {
           <div className="app-title-nav-group">
             <div className="app-title" onClick={() => setActiveView('corrector')} style={{ cursor: 'pointer' }}>
               <span>🇺🇸</span>
-              <span>EnglishCorrector</span>
+              <span>Inglés al Grano</span>
             </div>
             
             <nav className="header-nav">
@@ -42,7 +42,7 @@ function App() {
 
 
       <footer className="app-footer">
-        <p>© {new Date().getFullYear()} English Corrector App. Tu compañero inteligente para mejorar tu escritura.</p>
+        <p>© {new Date().getFullYear()} Inglés al Grano. Tu compañero inteligente para mejorar tu inglés.</p>
       </footer>
     </div>
   );

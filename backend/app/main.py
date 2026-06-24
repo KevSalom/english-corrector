@@ -19,8 +19,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="English Corrector API",
-    description="API for correcting English sentences and providing explanations using LLMs via OpenRouter",
+    title="Inglés al Grano API",
+    description="API for Inglés al Grano (correcting English sentences and providing explanations using LLMs via OpenRouter)",
     version="1.0.0"
 )
 

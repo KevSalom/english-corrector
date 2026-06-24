@@ -1,11 +1,11 @@
-# 🇺🇸 EnglishCorrector - Corrector de Inglés Inteligente con Explicaciones en Español
+# 🇺🇸 Inglés al Grano - Corrector y Práctica de Inglés Inteligente
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![OpenRouter](https://img.shields.io/badge/AI_API-OpenRouter-7c3aed?style=for-the-badge&logo=openai&logoColor=white)](https://openrouter.ai/)
 [![Vanilla CSS](https://img.shields.io/badge/Styling-Vanilla_CSS-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 
-**EnglishCorrector** es una aplicación web interactiva y de código abierto diseñada específicamente para estudiantes y profesionales hispanohablantes que buscan perfeccionar su escritura en inglés. 
+**Inglés al Grano** es una aplicación web interactiva y de código abierto diseñada específicamente para estudiantes y profesionales hispanohablantes que buscan perfeccionar su inglés. 
 
 A diferencia de los correctores automáticos tradicionales que solo reemplazan palabras, esta herramienta utiliza Inteligencia Artificial avanzada para realizar **Grammatical Error Correction (GEC)** y devolver **explicaciones didácticas en español** sobre cada regla gramatical, ortográfica o de estilo infringida.
 
