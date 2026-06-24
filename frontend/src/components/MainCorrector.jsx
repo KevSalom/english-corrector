@@ -67,8 +67,8 @@ export default function MainCorrector() {
   }, []);
 
   const handleCorrect = async (e) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
+    if (e) e.preventDefault();
+    if (loading || !inputText.trim()) return;
 
     setLoading(true);
     setError(null);
@@ -211,6 +211,11 @@ export default function MainCorrector() {
           id="english-input"
           value={inputText}
           onChange={(e) => setInputText(e.target.value.slice(0, 1000))}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+              handleCorrect(e);
+            }
+          }}
           placeholder="Escribe o pega aquí tu oración, por ejemplo: 'I am agree with you, but she don't write very good...'"
           className="corrector-textarea"
           disabled={loading}
@@ -232,6 +237,7 @@ export default function MainCorrector() {
             type="submit"
             disabled={loading || !inputText.trim()}
             className="btn-primary"
+            title="Revisar Oración (Ctrl + Enter)"
           >
             {loading ? (
               <>

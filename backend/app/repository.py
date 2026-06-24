@@ -59,7 +59,7 @@ class OpenRouterRepository:
                 temperature=0.0,  # Force deterministic, consistent output
                 extra_headers={
                     "HTTP-Referer": "https://github.com/kevin/english-corrector",
-                    "X-Title": "Inglés al Grano",
+                    "X-Title": "Ingles al Grano",
                 }
             )
 
