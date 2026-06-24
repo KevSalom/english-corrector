@@ -811,7 +811,7 @@ button {
   max-height: 250px;
   line-height: 2;
   font-size: 1.2rem;
-  font-weight: 500;
+  font-weight: 600;
   text-align: left;
   -webkit-mask-image: linear-gradient(
     to bottom,
@@ -831,23 +831,18 @@ button {
 
 .transcript-word-span {
   display: inline;
-  padding: 0.15rem 0.35rem;
-  margin: 0 0.05rem;
-  border-radius: var(--radius-sm);
   cursor: pointer;
   color: rgba(0, 0, 0, 0.55); /* Dark/black text for unspoken words */
   transition: all 0.15s ease;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
 }
 
 .transcript-word-span:hover {
-  color: #ffffff; /* Turns white on hover */
-  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: underline;
 }
 
 .transcript-word-span.active {
-  color: #ffffff; /* White text for spoken words */
+  color: #ffffff;
   background-color: transparent;
 }
 
