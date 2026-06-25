@@ -234,11 +234,11 @@ export default function MainCorrector({ isMini = false }) {
           disabled={loading}
         />
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 w-full">
           <button
             type="button"
             onClick={handleClear}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-secondary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="flex items-center justify-center gap-1.5 px-6 py-2.5 text-sm sm:text-base font-semibold rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-secondary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full sm:w-auto"
             disabled={loading || !inputText}
             title="Limpiar texto"
           >
@@ -249,7 +249,7 @@ export default function MainCorrector({ isMini = false }) {
           <button
             type="submit"
             disabled={loading || !inputText.trim()}
-            className="flex items-center gap-1.5 px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-brand hover:bg-brand-hover text-white shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="flex items-center justify-center gap-1.5 px-6 py-2.5 text-sm sm:text-base font-semibold rounded-xl bg-brand hover:bg-brand-hover text-white shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full sm:w-auto"
             title="Revisar Oración (Ctrl + Enter)"
           >
             {loading ? (
@@ -308,7 +308,7 @@ export default function MainCorrector({ isMini = false }) {
                   <button
                     type="button"
                     onClick={handleSpeak}
-                    className={`p-1.5 rounded-lg border border-border-custom hover:bg-surface-hover transition-all text-text-secondary cursor-pointer ${
+                    className={`p-1.5 rounded-xl border border-border-custom hover:bg-surface-hover transition-all text-text-secondary cursor-pointer ${
                       speaking ? 'bg-brand-light text-brand border-brand/20' : ''
                     }`}
                     title={speaking ? "Detener pronunciación" : "Escuchar pronunciación (US)"}
@@ -318,7 +318,7 @@ export default function MainCorrector({ isMini = false }) {
                   <button
                     type="button"
                     onClick={copyToClipboard}
-                    className="p-1.5 rounded-lg border border-border-custom hover:bg-surface-hover transition-all text-text-secondary cursor-pointer"
+                    className="p-1.5 rounded-xl border border-border-custom hover:bg-surface-hover transition-all text-text-secondary cursor-pointer"
                     title="Copiar texto corregido"
                   >
                     {copied ? <Check className="w-4 h-4 text-success-custom" /> : <Copy className="w-4 h-4" />}

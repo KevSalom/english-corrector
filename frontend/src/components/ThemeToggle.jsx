@@ -18,7 +18,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg border border-border-custom bg-surface hover:bg-surface-hover text-text-secondary hover:text-text-primary transition-all duration-200 cursor-pointer shadow-sm"
+      className="p-2 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-secondary hover:text-text-primary transition-all duration-200 cursor-pointer shadow-sm"
       aria-label="Toggle Theme"
       title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}
     >

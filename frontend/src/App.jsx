@@ -13,15 +13,15 @@ function App() {
         <header className="sticky top-0 bg-surface/90 backdrop-blur-md border-b border-border-custom z-40 transition-all duration-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <NavLink to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-text-primary">
-                <span>🇺🇸</span>
+              <NavLink to="/" className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-text-primary">
+                <img src="/favicon.svg" alt="Inglés al Grano Logo" className="w-7 h-7 object-contain" />
                 <span className="font-bold">Inglés al Grano</span>
               </NavLink>
               
               <nav className="hidden sm:flex items-center gap-1">
                 <NavLink 
                   to="/" 
-                  className={({ isActive }) => `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={({ isActive }) => `px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
                     isActive 
                       ? 'bg-brand-light text-brand font-semibold' 
                       : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
@@ -32,7 +32,7 @@ function App() {
                 </NavLink>
                 <NavLink 
                   to="/video" 
-                  className={({ isActive }) => `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={({ isActive }) => `px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
                     isActive 
                       ? 'bg-brand-light text-brand font-semibold' 
                       : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
@@ -47,7 +47,7 @@ function App() {
               <nav className="sm:hidden flex items-center gap-1">
                 <NavLink 
                   to="/" 
-                  className={({ isActive }) => `px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  className={({ isActive }) => `px-3 py-1.5 text-xs font-medium rounded-xl transition-colors ${
                     isActive 
                       ? 'bg-brand-light text-brand font-semibold' 
                       : 'text-text-secondary hover:text-text-primary'
@@ -58,7 +58,7 @@ function App() {
                 </NavLink>
                 <NavLink 
                   to="/video" 
-                  className={({ isActive }) => `px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  className={({ isActive }) => `px-3 py-1.5 text-xs font-medium rounded-xl transition-colors ${
                     isActive 
                       ? 'bg-brand-light text-brand font-semibold' 
                       : 'text-text-secondary hover:text-text-primary'
