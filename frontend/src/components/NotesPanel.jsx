@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Trash2, StickyNote, AlertCircle } from 'lucide-react';
+import { X, Trash2, StickyNote, AlertCircle, Edit2 } from 'lucide-react';
 
 export default function NotesPanel({ isOpen, onClose }) {
   const [notes, setNotes] = useState([]);
@@ -7,6 +7,8 @@ export default function NotesPanel({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const [error, setError] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editingContent, setEditingContent] = useState('');
   const textareaRef = useRef(null);
 
   // Fetch notes on open
@@ -74,6 +76,36 @@ export default function NotesPanel({ isOpen, onClose }) {
       }
     } catch (err) {
       console.error('Error deleting note:', err);
+    }
+  };
+
+  const handleUpdateNote = async (id) => {
+    if (!editingContent.trim() || loading) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const apiBase = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiBase}/api/notes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: editingContent.trim() }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || 'Error al actualizar la nota.');
+      }
+
+      setNotes((prev) => prev.map((n) => (n.id === id ? data : n)));
+      setEditingId(null);
+      setEditingContent('');
+      showToast('Nota actualizada');
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Error de conexión.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -184,22 +216,72 @@ export default function NotesPanel({ isOpen, onClose }) {
             notes.map((note) => (
               <div
                 key={note.id}
-                className="p-4 rounded-xl border border-border-custom bg-surface shadow-sm flex flex-col gap-2 group"
+                className="p-4 rounded-xl border border-border-custom bg-surface shadow-sm flex flex-col gap-3"
               >
-                <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap break-words m-0">
-                  {note.content}
-                </p>
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-xs text-text-muted">{timeAgo(note.created_at)}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(note.id)}
-                    className="p-1.5 rounded-lg text-text-muted hover:text-error-custom hover:bg-error-light-custom/30 transition-colors cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100"
-                    title="Eliminar nota"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                {editingId === note.id ? (
+                  <div className="flex flex-col gap-2.5">
+                    <textarea
+                      value={editingContent}
+                      onChange={(e) => setEditingContent(e.target.value.slice(0, 2000))}
+                      className="w-full p-2.5 rounded-xl border border-border-custom bg-app text-text-primary text-sm focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all outline-none resize-none h-24"
+                      autoFocus
+                    />
+                    <div className="flex justify-end gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingId(null);
+                          setEditingContent('');
+                        }}
+                        className="px-3 py-1.5 rounded-lg border border-border-custom text-text-secondary hover:bg-surface-hover text-xs font-semibold cursor-pointer transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateNote(note.id)}
+                        disabled={!editingContent.trim() || loading}
+                        className="px-3.5 py-1.5 rounded-lg bg-brand hover:bg-brand-hover text-white text-xs font-semibold shadow-sm cursor-pointer disabled:opacity-50 transition-colors"
+                      >
+                        Guardar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap break-words m-0">
+                      {note.content}
+                    </p>
+                    <div className="flex items-center justify-between border-t border-border-custom/30 pt-2 shrink-0">
+                      <span className="text-[11px] text-text-muted">{timeAgo(note.created_at)}</span>
+                      
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingId(note.id);
+                            setEditingContent(note.content);
+                          }}
+                          className="flex items-center gap-1 text-xs text-text-muted hover:text-brand transition-colors cursor-pointer"
+                          title="Editar nota"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span className="font-semibold">Editar</span>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(note.id)}
+                          className="flex items-center gap-1 text-xs text-text-muted hover:text-error-custom transition-colors cursor-pointer"
+                          title="Eliminar nota"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span className="font-semibold">Eliminar</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ))
           ) : (

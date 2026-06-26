@@ -125,3 +125,22 @@ def delete_note(note_id: str) -> bool:
         return cursor.rowcount > 0
     finally:
         conn.close()
+
+def update_note(note_id: str, content: str) -> Dict[str, Any]:
+    """Updates a note's content by ID. Returns the updated record or None if not found."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE notes SET content = ? WHERE id = ?",
+            (content.strip(), note_id)
+        )
+        conn.commit()
+        if cursor.rowcount == 0:
+            return None
+        
+        cursor.execute("SELECT id, content, created_at FROM notes WHERE id = ?", (note_id,))
+        row = cursor.fetchone()
+        return dict(row)
+    finally:
+        conn.close()

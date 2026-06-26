@@ -287,6 +287,31 @@ async def delete_note_endpoint(note_id: str):
             detail=f"Error al eliminar la nota: {str(e)}"
         )
 
+@app.put("/api/notes/{note_id}", response_model=NoteResponse)
+async def update_note_endpoint(note_id: str, request: NoteCreateRequest):
+    from app.db import update_note
+    if not request.content.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El contenido de la nota no puede estar vacío."
+        )
+    try:
+        updated = update_note(note_id, request.content)
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="La nota no existe."
+            )
+        return updated
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating note {note_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al actualizar la nota: {str(e)}"
+        )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host=settings.host, port=settings.port, reload=True)
