@@ -201,8 +201,8 @@ export default function MainCorrector({ isMini = false }) {
           <h1 className="text-3xl sm:text-4xl font-serif font-extrabold tracking-tight text-text-primary">
             Práctica de Escritura
           </h1>
-          <p className="text-text-secondary text-sm sm:text-base mt-2">
-            Escribe en inglés y recibe correcciones detalladas al instante.
+          <p className="text-text-secondary text-sm sm:text-base mt-2 text-pretty">
+            Escribe en inglés y mejora tu <strong>writing</strong> con correcciones detalladas al instante.
           </p>
         </div>
       )}

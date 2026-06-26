@@ -389,7 +389,7 @@ export default function VideoPracticer() {
 
   const renderWorkspace = () => {
     const workspaceContainerClass = isSideBySide
-      ? "grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-3 sm:gap-6 items-stretch text-left w-full animate-in fade-in duration-200"
+      ? "grid grid-cols-1 lg:grid-cols-[5fr_2fr] gap-3 sm:gap-6 items-stretch text-left w-full animate-in fade-in duration-200"
       : "flex flex-col gap-3 sm:gap-6 text-left w-full animate-in fade-in duration-200";
 
     const playerContainerClass = "w-full border border-border-custom rounded-2xl overflow-hidden shadow-md bg-surface flex flex-col justify-center h-fit self-center";
@@ -672,15 +672,15 @@ export default function VideoPracticer() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-6">
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-3 sm:gap-6">
       {/* Header Section */}
       {!videoId && (
         <div className="text-center sm:text-left">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">
-            Práctica de Comprensión con Vídeo
+            Práctica de Comprensión
           </h1>
-          <p className="text-text-secondary text-sm sm:text-base mt-2">
-            Sigue la transcripción de videos en tiempo real y haz clic para escuchar.
+          <p className="text-text-secondary text-sm sm:text-base mt-2 text-pretty">
+            Sigue la transcripción de videos y mejora tu <strong>listening</strong> y vocabulario en inglés.
           </p>
         </div>
       )}
