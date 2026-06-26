@@ -389,8 +389,8 @@ export default function VideoPracticer() {
 
   const renderWorkspace = () => {
     const workspaceContainerClass = isSideBySide
-      ? "grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 items-stretch text-left w-full animate-in fade-in duration-200"
-      : "flex flex-col gap-6 text-left w-full animate-in fade-in duration-200";
+      ? "grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-3 sm:gap-6 items-stretch text-left w-full animate-in fade-in duration-200"
+      : "flex flex-col gap-3 sm:gap-6 text-left w-full animate-in fade-in duration-200";
 
     const playerContainerClass = "w-full border border-border-custom rounded-2xl overflow-hidden shadow-md bg-surface flex flex-col justify-center h-fit self-center";
 
@@ -617,12 +617,12 @@ export default function VideoPracticer() {
   const renderCine = () => {
     const isAlreadySaved = savedVideos.some(v => v.url === videoUrl);
     return (
-      <div className="flex flex-col gap-6 text-left w-full animate-in fade-in duration-200">
-        <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-surface border border-border-custom p-4 rounded-2xl shadow-sm">
+      <div className="flex flex-col gap-3 sm:gap-6 text-left w-full animate-in fade-in duration-200">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center sm:bg-surface sm:border sm:border-border-custom sm:p-4 sm:rounded-2xl sm:shadow-sm">
           <button
             type="button"
             onClick={() => setSearchParams({})}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-border-custom bg-app hover:bg-surface-hover text-text-primary font-bold text-sm transition-colors cursor-pointer"
+            className="flex items-center justify-start sm:justify-center gap-2 py-1 sm:py-2 px-0 sm:px-4 rounded-xl text-text-secondary sm:text-text-primary hover:text-text-primary font-bold text-sm border-none sm:border sm:border-border-custom bg-transparent sm:bg-app sm:hover:bg-surface-hover transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4.5 h-4.5 text-brand" />
             <span>Volver a la Biblioteca</span>
@@ -672,7 +672,7 @@ export default function VideoPracticer() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">
+    <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-6">
       {/* Header Section */}
       {!videoId && (
         <div className="text-center sm:text-left">
