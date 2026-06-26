@@ -222,12 +222,17 @@ export default function VideoPracticer() {
       const activeElement = document.getElementById(`seg-line-${activeIndex}`);
       const container = document.getElementById('transcript-container');
       if (activeElement && container) {
-        const containerTop = container.getBoundingClientRect().top;
-        const elementTop = activeElement.getBoundingClientRect().top;
-        const scrollOffset = elementTop - containerTop - (container.clientHeight / 2) + (activeElement.clientHeight / 2);
-
-        container.scrollBy({
-          top: scrollOffset,
+        const elementRect = activeElement.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        
+        // Calculate absolute position inside the scroll container (scroll-independent)
+        const absoluteElementTop = elementRect.top - containerRect.top + container.scrollTop;
+        
+        // Center the active line (using 45% of container height to keep it slightly above the middle for better readability of next lines)
+        const targetScrollTop = absoluteElementTop - (container.clientHeight * 0.45) + (elementRect.height / 2);
+        
+        container.scrollTo({
+          top: targetScrollTop,
           behavior: 'smooth',
         });
       }
