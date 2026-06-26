@@ -56,6 +56,7 @@ export default function VideoPracticer() {
   const timerRef = useRef(null);
   const transcriptRef = useRef([]);
   const activeIndexRef = useRef(-1);
+  const scrollAnimRef = useRef(null);
 
   // Keep transcript ref updated so the interval callback always sees the newest data
   useEffect(() => {
@@ -216,7 +217,7 @@ export default function VideoPracticer() {
     };
   }, [videoId]);
 
-  // Autoscroll to active line
+  // Autoscroll to active line with custom smooth ease-out animation
   useEffect(() => {
     if (activeIndex >= 0) {
       const activeElement = document.getElementById(`seg-line-${activeIndex}`);
@@ -231,12 +232,42 @@ export default function VideoPracticer() {
         // Center the active line (using 45% of container height to keep it slightly above the middle for better readability of next lines)
         const targetScrollTop = absoluteElementTop - (container.clientHeight * 0.45) + (elementRect.height / 2);
         
-        container.scrollTo({
-          top: targetScrollTop,
-          behavior: 'smooth',
-        });
+        // Cancel any active animation frame
+        if (scrollAnimRef.current) {
+          cancelAnimationFrame(scrollAnimRef.current);
+        }
+
+        const start = container.scrollTop;
+        const change = targetScrollTop - start;
+        const duration = 750; // 750ms for a very gentle and soft glide transition
+        let startTime = null;
+
+        const animate = (currentTime) => {
+          if (!startTime) startTime = currentTime;
+          const timeElapsed = currentTime - startTime;
+          const progress = Math.min(timeElapsed / duration, 1);
+          
+          // Easing: easeOutCubic (slows down gently at the end)
+          const ease = 1 - Math.pow(1 - progress, 3);
+          
+          container.scrollTop = start + change * ease;
+
+          if (timeElapsed < duration) {
+            scrollAnimRef.current = requestAnimationFrame(animate);
+          } else {
+            scrollAnimRef.current = null;
+          }
+        };
+
+        scrollAnimRef.current = requestAnimationFrame(animate);
       }
     }
+
+    return () => {
+      if (scrollAnimRef.current) {
+        cancelAnimationFrame(scrollAnimRef.current);
+      }
+    };
   }, [activeIndex]);
 
 
