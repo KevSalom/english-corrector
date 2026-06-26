@@ -2,12 +2,15 @@ import logging
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
+from typing import List
 from app.schemas import (
     CorrectionRequest,
     CorrectionResponse,
     TranscriptRequest,
     TranscriptResponse,
-    TranscriptSegment
+    TranscriptSegment,
+    VideoSaveRequest,
+    VideoResponse
 )
 from app.repository import OpenRouterRepository
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -32,6 +35,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup_event():
+    from app.db import init_db
+    try:
+        init_db()
+        logger.info("Database initialized successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {e}")
+
 
 # Lazy instantiation of repository so it doesn't fail on startup if api key is missing
 repo = None
@@ -162,6 +175,64 @@ async def health_check():
         "model": settings.openrouter_model,
         "api_key_configured": is_key_set
     }
+
+@app.get("/api/videos", response_model=List[VideoResponse])
+async def get_saved_videos():
+    from app.db import list_videos
+    try:
+        return list_videos()
+    except Exception as e:
+        logger.error(f"Error listing videos: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al listar videos guardados: {str(e)}"
+        )
+
+@app.post("/api/videos", response_model=VideoResponse, status_code=status.HTTP_201_CREATED)
+async def save_video_link(request: VideoSaveRequest):
+    from app.db import add_video
+    if not request.title.strip() or not request.url.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El título y la URL no pueden estar vacíos."
+        )
+    
+    # Extract video ID to validate YouTube URL
+    video_id = extract_youtube_video_id(request.url)
+    if not video_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="URL de YouTube inválida. No se pudo guardar."
+        )
+        
+    try:
+        return add_video(request.title, request.url)
+    except Exception as e:
+        logger.error(f"Error saving video: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al guardar el video: {str(e)}"
+        )
+
+@app.delete("/api/videos/{video_id}")
+async def delete_saved_video(video_id: str):
+    from app.db import delete_video
+    try:
+        deleted = delete_video(video_id)
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="El video no existe."
+            )
+        return {"message": "Video eliminado correctamente"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting video {video_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al eliminar el video: {str(e)}"
+        )
 
 if __name__ == "__main__":
     import uvicorn

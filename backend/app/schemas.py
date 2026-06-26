@@ -36,3 +36,14 @@ class TranscriptResponse(BaseModel):
     video_id: str = Field(..., description="The extracted 11-character YouTube video ID.")
     segments: List[TranscriptSegment] = Field(..., description="The list of timed transcript segments.")
 
+class VideoSaveRequest(BaseModel):
+    title: str = Field(..., description="The user-defined name for the video link.")
+    url: str = Field(..., description="The YouTube video URL.")
+
+class VideoResponse(BaseModel):
+    id: str = Field(..., description="Unique ID of the saved video entry.")
+    title: str = Field(..., description="The user-defined name for the video link.")
+    url: str = Field(..., description="The YouTube video URL.")
+    created_at: str = Field(..., description="The timestamp when the video was saved.")
+
+
