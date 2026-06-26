@@ -1,9 +1,39 @@
+import { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import CorrectorPage from './pages/CorrectorPage';
 import VideoPage from './pages/VideoPage';
 import ThemeToggle from './components/ThemeToggle';
+import NotesButton from './components/NotesButton';
+import NotesPanel from './components/NotesPanel';
 
 function App() {
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [noteCount, setNoteCount] = useState(0);
+
+  // Fetch note count on mount and after panel closes
+  const fetchNoteCount = useCallback(async () => {
+    try {
+      const apiBase = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiBase}/api/notes`);
+      if (response.ok) {
+        const data = await response.json();
+        setNoteCount(data.length);
+      }
+    } catch (err) {
+      console.error('Error fetching note count:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNoteCount();
+  }, [fetchNoteCount]);
+
+  const handleNotesClose = () => {
+    setNotesOpen(false);
+    // Refresh count after closing (user may have added/deleted notes)
+    fetchNoteCount();
+  };
+
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-app text-text-primary transition-all duration-200">
@@ -80,11 +110,15 @@ function App() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-surface border-t border-border-custom py-6 mt-12 transition-all duration-200">
+        <footer className="py-6 mt-12 transition-all duration-200">
           <div className="max-w-7xl mx-auto px-4 text-center text-sm text-text-muted">
-            <p>© {new Date().getFullYear()} Inglés al Grano. Tu compañero inteligente para mejorar tu inglés.</p>
+            <p>© {new Date().getFullYear()} Inglés al Grano.</p>
           </div>
         </footer>
+
+        {/* Notes — available on all pages */}
+        <NotesButton onClick={() => setNotesOpen(true)} noteCount={noteCount} />
+        <NotesPanel isOpen={notesOpen} onClose={handleNotesClose} />
       </div>
     </Router>
   );

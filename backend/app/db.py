@@ -33,6 +33,13 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS notes (
+                id TEXT PRIMARY KEY,
+                content TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         conn.commit()
     finally:
         conn.close()
@@ -72,6 +79,48 @@ def delete_video(video_id: str) -> bool:
     try:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM saved_videos WHERE id = ?", (video_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+# --- Notes CRUD ---
+
+def list_notes() -> List[Dict[str, Any]]:
+    """Returns all notes sorted by creation date descending."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, content, created_at FROM notes ORDER BY created_at DESC")
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+def add_note(content: str) -> Dict[str, Any]:
+    """Adds a new note and returns the created record."""
+    note_id = str(uuid.uuid4())
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO notes (id, content) VALUES (?, ?)",
+            (note_id, content.strip())
+        )
+        conn.commit()
+        
+        cursor.execute("SELECT id, content, created_at FROM notes WHERE id = ?", (note_id,))
+        row = cursor.fetchone()
+        return dict(row)
+    finally:
+        conn.close()
+
+def delete_note(note_id: str) -> bool:
+    """Deletes a note by ID. Returns True if deleted, False if not found."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
         conn.commit()
         return cursor.rowcount > 0
     finally:

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Clock, Play, AlertCircle, Bookmark, Trash2, X, ArrowLeft, Columns, Rows } from 'lucide-react';
+import { Clock, Play, AlertCircle, Bookmark, Trash2, X, ArrowLeft, Columns, Rows, Copy, StickyNote } from 'lucide-react';
 
 
 const YoutubeIcon = (props) => (
@@ -21,7 +21,6 @@ export default function VideoPracticer() {
   const [videoId, setVideoId] = useState(null);
   const [transcript, setTranscript] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [searchQuery, setSearchQuery] = useState('');
   const [savedVideos, setSavedVideos] = useState([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [videoTitleToSave, setVideoTitleToSave] = useState('');
@@ -30,6 +29,9 @@ export default function VideoPracticer() {
   const [searchParams, setSearchParams] = useSearchParams();
   const urlParam = searchParams.get('url') || '';
   const [isSideBySide, setIsSideBySide] = useState(true);
+  const [viewMode, setViewMode] = useState('paragraph'); // 'paragraph' | 'list'
+  const [copiedListIndex, setCopiedListIndex] = useState(-1);
+  const [savingNoteIndex, setSavingNoteIndex] = useState(-1);
 
   const playerRef = useRef(null);
 
@@ -377,13 +379,49 @@ export default function VideoPracticer() {
     }
   };
 
-  // Filter transcript segments based on search input
-  const filteredTranscript = transcript.map((seg, idx) => ({ ...seg, originalIndex: idx }))
-    .filter(seg => seg.text.toLowerCase().includes(searchQuery.toLowerCase()));
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleCopyFromList = async (text, idx) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedListIndex(idx);
+      setTimeout(() => setCopiedListIndex(-1), 1200);
+    } catch (err) {
+      console.error('Failed to copy text', err);
+    }
+  };
+
+  const handleCreateNoteFromList = async (text, idx) => {
+    setSavingNoteIndex(idx);
+    try {
+      const apiBase = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiBase}/api/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: text.trim() }),
+      });
+
+      if (response.ok) {
+        window.dispatchEvent(new Event('notes-updated'));
+        setTimeout(() => setSavingNoteIndex(-1), 1200);
+      } else {
+        alert('Error al guardar la nota');
+        setSavingNoteIndex(-1);
+      }
+    } catch (err) {
+      console.error('Error saving note:', err);
+      alert('Error de conexión al guardar la nota');
+      setSavingNoteIndex(-1);
+    }
+  };
 
   const renderWorkspace = () => {
     const workspaceContainerClass = isSideBySide
-      ? "grid grid-cols-1 lg:grid-cols-[5fr_2fr] gap-3 sm:gap-6 items-stretch text-left w-full animate-in fade-in duration-200"
+      ? "grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-3 sm:gap-6 items-stretch text-left w-full animate-in fade-in duration-200"
       : "flex flex-col gap-3 sm:gap-6 text-left w-full animate-in fade-in duration-200";
 
     const playerContainerClass = "w-full border border-border-custom rounded-2xl overflow-hidden shadow-md bg-surface flex flex-col justify-center h-fit self-center";
@@ -393,8 +431,16 @@ export default function VideoPracticer() {
       : "w-full bg-brand border border-brand/20 rounded-2xl shadow-md flex flex-col overflow-hidden h-fit";
 
     const scrollAreaClass = isSideBySide
-      ? "overflow-y-auto pt-10 px-6 pb-32 flex-grow h-[320px] lg:h-0 leading-[2] text-[1.25rem] font-semibold text-left select-none"
-      : "overflow-y-auto pt-10 px-6 pb-32 h-[320px] lg:h-[350px] leading-[2] text-[1.55rem] font-semibold text-left select-none";
+      ? `overflow-y-auto pt-8 pb-24 flex-grow h-[320px] lg:h-0 text-left select-none ${
+          viewMode === 'paragraph' 
+            ? 'px-6 leading-[2] text-[1.25rem] font-semibold' 
+            : 'px-3 sm:px-4 leading-[1.6] text-sm lg:text-base'
+        }`
+      : `overflow-y-auto pt-8 pb-24 h-[320px] lg:h-[350px] text-left select-none ${
+          viewMode === 'paragraph' 
+            ? 'px-6 leading-[2] text-[1.55rem] font-semibold' 
+            : 'px-3 sm:px-4 leading-[1.6] text-base lg:text-[1.1rem]'
+        }`;
 
     return (
       <div className={workspaceContainerClass}>
@@ -407,22 +453,36 @@ export default function VideoPracticer() {
 
         {/* Right column: Transcript */}
         <div className={transcriptContainerClass}>
-          <div className="flex justify-between items-center py-5 px-6 border-b border-brand/10 bg-brand-hover shrink-0">
+          <div className="flex justify-between items-center py-4 px-6 border-b border-brand/10 bg-brand-hover shrink-0">
             <h3 className="text-white font-bold flex items-center gap-2 m-0 text-sm sm:text-base">
               <Clock className="w-4.5 h-4.5" />
-              <span>Transcripción Sincronizada</span>
+              <span>Transcripción</span>
             </h3>
-            
-            {/* Word search filter */}
-            <div className="relative w-48 sm:w-60">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/60 w-3.5 h-3.5" />
-              <input
-                type="text"
-                placeholder="Buscar palabra..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/10 text-white placeholder-white/50 border border-white/20 pl-9 pr-3 py-1.5 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all"
-              />
+
+            {/* Toggle View Mode */}
+            <div className="flex bg-white/10 p-0.5 rounded-lg border border-white/5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('paragraph')}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  viewMode === 'paragraph'
+                    ? 'bg-white text-brand shadow-sm'
+                    : 'text-white/80 hover:text-white'
+                }`}
+              >
+                Párrafo
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'bg-white text-brand shadow-sm'
+                    : 'text-white/80 hover:text-white'
+                }`}
+              >
+                Línea a Línea
+              </button>
             </div>
           </div>
 
@@ -431,31 +491,94 @@ export default function VideoPracticer() {
             id="transcript-container" 
             className={scrollAreaClass}
             style={{
-              maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)'
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)'
             }}
           >
-            {filteredTranscript.length > 0 ? (
-              filteredTranscript.map((seg) => {
-                const isActive = seg.originalIndex <= activeIndex + 1;
-                return (
-                  <span
-                    key={seg.originalIndex}
-                    id={`seg-line-${seg.originalIndex}`}
-                    onClick={() => handleSeek(seg.start)}
-                    className={`inline cursor-pointer transition-all duration-150 ${
-                      isActive 
-                        ? 'text-white font-bold' 
-                        : 'text-black/60 hover:text-white hover:underline'
-                    }`}
-                  >
-                    {seg.text}{' '}
-                  </span>
-                );
-              })
+            {transcript.length > 0 ? (
+              viewMode === 'paragraph' ? (
+                // Paragraph Mode (continuous spans)
+                transcript.map((seg, idx) => {
+                  const isActive = idx <= activeIndex + 1;
+                  return (
+                    <span
+                      key={idx}
+                      id={`seg-line-${idx}`}
+                      onClick={() => handleSeek(seg.start)}
+                      className={`cursor-pointer transition-all duration-150 ${
+                        isActive 
+                          ? 'text-white font-bold' 
+                          : 'text-black/60 hover:text-white hover:underline'
+                      }`}
+                    >
+                      {seg.text}{' '}
+                    </span>
+                  );
+                })
+              ) : (
+                // List Mode (one segment per row)
+                <div className="flex flex-col gap-2">
+                  {transcript.map((seg, idx) => {
+                    const isActive = idx <= activeIndex + 1;
+                    return (
+                      <div
+                        key={idx}
+                        id={`seg-line-${idx}`}
+                        className={`flex items-start justify-between gap-3 p-2 rounded-xl transition-all duration-150 group/row ${
+                          isActive
+                            ? 'bg-white/15 text-white font-semibold'
+                            : 'text-white/60 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        {/* Left: Time and Text */}
+                        <div 
+                          onClick={() => handleSeek(seg.start)}
+                          className="flex items-start gap-2.5 flex-grow cursor-pointer"
+                        >
+                          {/* Time badge */}
+                          <span className="text-[10px] font-mono opacity-70 bg-white/10 px-1.5 py-0.5 rounded shrink-0 mt-0.5">
+                            {formatTime(seg.start)}
+                          </span>
+                          <span className="text-sm lg:text-[1.1rem] lg:font-semibold leading-relaxed text-left">
+                            {seg.text}
+                          </span>
+                        </div>
+
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-1 shrink-0 opacity-100 lg:opacity-0 lg:group-hover/row:opacity-100 lg:focus-within:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyFromList(seg.text, idx)}
+                            className="p-1 rounded-lg hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+                            title="Copiar frase"
+                          >
+                            {copiedListIndex === idx ? (
+                              <span className="text-[10px] font-bold text-white">✓</span>
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleCreateNoteFromList(seg.text, idx)}
+                            className="p-1 rounded-lg hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+                            title="Anotar frase"
+                          >
+                            {savingNoteIndex === idx ? (
+                              <span className="text-[10px] font-bold text-white">✓</span>
+                            ) : (
+                              <StickyNote className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )
             ) : (
               <div className="h-full flex items-center justify-center text-white/70 text-sm py-12">
-                {searchQuery ? 'No se encontraron fragmentos con esa palabra.' : 'Cargando transcripción...'}
+                Cargando transcripción...
               </div>
             )}
           </div>
@@ -784,6 +907,7 @@ export default function VideoPracticer() {
           </div>
         </div>
       )}
+
 
     </div>
   );

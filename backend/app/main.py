@@ -10,7 +10,9 @@ from app.schemas import (
     TranscriptResponse,
     TranscriptSegment,
     VideoSaveRequest,
-    VideoResponse
+    VideoResponse,
+    NoteCreateRequest,
+    NoteResponse
 )
 from app.repository import OpenRouterRepository
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -232,6 +234,57 @@ async def delete_saved_video(video_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al eliminar el video: {str(e)}"
+        )
+
+# --- Notes Endpoints ---
+
+@app.get("/api/notes", response_model=List[NoteResponse])
+async def get_notes():
+    from app.db import list_notes
+    try:
+        return list_notes()
+    except Exception as e:
+        logger.error(f"Error listing notes: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al listar las notas: {str(e)}"
+        )
+
+@app.post("/api/notes", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
+async def create_note(request: NoteCreateRequest):
+    from app.db import add_note
+    if not request.content.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El contenido de la nota no puede estar vacío."
+        )
+    try:
+        return add_note(request.content)
+    except Exception as e:
+        logger.error(f"Error creating note: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al crear la nota: {str(e)}"
+        )
+
+@app.delete("/api/notes/{note_id}")
+async def delete_note_endpoint(note_id: str):
+    from app.db import delete_note
+    try:
+        deleted = delete_note(note_id)
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="La nota no existe."
+            )
+        return {"message": "Nota eliminada correctamente"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting note {note_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al eliminar la nota: {str(e)}"
         )
 
 if __name__ == "__main__":

@@ -46,4 +46,10 @@ class VideoResponse(BaseModel):
     url: str = Field(..., description="The YouTube video URL.")
     created_at: str = Field(..., description="The timestamp when the video was saved.")
 
+class NoteCreateRequest(BaseModel):
+    content: str = Field(..., max_length=2000, description="The text content of the note.")
 
+class NoteResponse(BaseModel):
+    id: str = Field(..., description="Unique ID of the note.")
+    content: str = Field(..., description="The text content of the note.")
+    created_at: str = Field(..., description="The timestamp when the note was created.")
