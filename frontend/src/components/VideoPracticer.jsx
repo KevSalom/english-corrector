@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Clock, Play, AlertCircle, BookOpen, Bookmark, Trash2, X, Plus } from 'lucide-react';
+import { Search, Clock, Play, AlertCircle, BookOpen, Bookmark, Trash2, X, Plus, ArrowLeft, Columns, Rows } from 'lucide-react';
 
 
 const YoutubeIcon = (props) => (
@@ -29,6 +29,7 @@ export default function VideoPracticer() {
   const [saveError, setSaveError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const urlParam = searchParams.get('url') || '';
+  const [isSideBySide, setIsSideBySide] = useState(true);
 
   const playerRef = useRef(null);
 
@@ -351,18 +352,32 @@ export default function VideoPracticer() {
     .filter(seg => seg.text.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const renderWorkspace = () => {
+    const workspaceContainerClass = isSideBySide
+      ? "grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 items-stretch text-left w-full animate-in fade-in duration-200"
+      : "flex flex-col gap-6 text-left w-full animate-in fade-in duration-200";
+
+    const playerContainerClass = "w-full border border-border-custom rounded-2xl overflow-hidden shadow-md bg-surface flex flex-col justify-center h-fit self-center";
+
+    const transcriptContainerClass = isSideBySide
+      ? "w-full bg-brand border border-brand/20 rounded-2xl shadow-md flex flex-col overflow-hidden h-full min-h-[350px]"
+      : "w-full bg-brand border border-brand/20 rounded-2xl shadow-md flex flex-col overflow-hidden h-fit";
+
+    const scrollAreaClass = isSideBySide
+      ? "overflow-y-auto pt-10 px-6 pb-32 flex-grow h-[320px] lg:h-0 leading-[2] text-[1.25rem] font-semibold text-left select-none"
+      : "overflow-y-auto pt-10 px-6 pb-32 h-[320px] lg:h-[350px] leading-[2] text-[1.55rem] font-semibold text-left select-none";
+
     return (
-      <div className="flex flex-col gap-6 text-left w-full animate-in fade-in duration-200">
-        {/* Top panel: Player */}
-        <div className="w-full border border-border-custom rounded-2xl overflow-hidden shadow-md bg-surface">
+      <div className={workspaceContainerClass}>
+        {/* Left column: Player */}
+        <div className={playerContainerClass}>
           <div className="relative w-full pt-[56.25%] [&>iframe]:absolute [&>iframe]:top-0 [&>iframe]:left-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0">
             <div id="youtube-player" className="absolute top-0 left-0 w-full h-full border-0"></div>
           </div>
         </div>
 
-        {/* Bottom panel: Transcript */}
-        <div className="w-full bg-brand border border-brand/20 rounded-2xl shadow-md flex flex-col overflow-hidden h-fit">
-          <div className="flex justify-between items-center py-5 px-6 border-b border-brand/10 bg-brand-hover">
+        {/* Right column: Transcript */}
+        <div className={transcriptContainerClass}>
+          <div className="flex justify-between items-center py-5 px-6 border-b border-brand/10 bg-brand-hover shrink-0">
             <h3 className="text-white font-bold flex items-center gap-2 m-0 text-sm sm:text-base">
               <Clock className="w-4.5 h-4.5" />
               <span>Transcripción Sincronizada</span>
@@ -384,7 +399,7 @@ export default function VideoPracticer() {
           {/* Scrollable Concatenated Container */}
           <div 
             id="transcript-container" 
-            className="overflow-y-auto pt-10 px-6 pb-40 max-h-[320px] leading-[2] text-[1.55rem] font-semibold text-left select-none"
+            className={scrollAreaClass}
             style={{
               maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)'
@@ -454,7 +469,7 @@ export default function VideoPracticer() {
               />
             </div>
             
-            <div className="flex gap-2 sm:gap-3 shrink-0">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => {
@@ -463,7 +478,7 @@ export default function VideoPracticer() {
                   setShowSaveModal(true);
                 }}
                 disabled={loading || !videoUrl.trim()}
-                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-primary font-semibold shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-primary font-semibold shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
               >
                 <Bookmark className="w-4 h-4 text-brand" />
                 <span>Guardar</span>
@@ -472,7 +487,7 @@ export default function VideoPracticer() {
               <button
                 type="submit"
                 disabled={loading || !videoUrl.trim()}
-                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand hover:bg-brand-hover text-white font-semibold shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand hover:bg-brand-hover text-white font-semibold shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
               >
                 {loading ? (
                   <>
@@ -567,29 +582,52 @@ export default function VideoPracticer() {
     const isAlreadySaved = savedVideos.some(v => v.url === videoUrl);
     return (
       <div className="flex flex-col gap-6 text-left w-full animate-in fade-in duration-200">
-        <div className="flex justify-between items-center bg-surface border border-border-custom p-4 rounded-2xl shadow-sm">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-surface border border-border-custom p-4 rounded-2xl shadow-sm">
           <button
             type="button"
             onClick={() => setSearchParams({})}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border-custom bg-app hover:bg-surface-hover text-text-primary font-bold text-sm transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-border-custom bg-app hover:bg-surface-hover text-text-primary font-bold text-sm transition-colors cursor-pointer"
           >
-            <span>⬅️ Volver a la Biblioteca</span>
+            <ArrowLeft className="w-4.5 h-4.5 text-brand" />
+            <span>Volver a la Biblioteca</span>
           </button>
-          
-          {!isAlreadySaved && (
+
+          <div className="flex gap-2 sm:gap-3 justify-between sm:justify-end">
+            {/* Layout Toggle Button - Visible only on desktop screen size */}
             <button
               type="button"
-              onClick={() => {
-                setVideoTitleToSave('');
-                setSaveError(null);
-                setShowSaveModal(true);
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-light border border-brand/20 hover:bg-brand hover:text-white text-brand font-bold text-sm transition-all cursor-pointer"
+              onClick={() => setIsSideBySide(!isSideBySide)}
+              className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl border border-border-custom bg-app hover:bg-surface-hover text-text-primary font-bold text-sm transition-colors cursor-pointer"
+              title={isSideBySide ? "Ver apilado" : "Ver en paralelo"}
             >
-              <Bookmark className="w-4 h-4" />
-              <span>Guardar este video</span>
+              {isSideBySide ? (
+                <>
+                  <Rows className="w-4 h-4 text-brand" />
+                  <span>Ver Apilado</span>
+                </>
+              ) : (
+                <>
+                  <Columns className="w-4 h-4 text-brand" />
+                  <span>Ver en Paralelo</span>
+                </>
+              )}
             </button>
-          )}
+          
+            {!isAlreadySaved && (
+              <button
+                type="button"
+                onClick={() => {
+                  setVideoTitleToSave('');
+                  setSaveError(null);
+                  setShowSaveModal(true);
+                }}
+                className="flex flex-grow lg:flex-grow-0 items-center justify-center gap-2 px-4 py-2 rounded-xl bg-brand-light border border-brand/20 hover:bg-brand hover:text-white text-brand font-bold text-sm transition-all cursor-pointer"
+              >
+                <Bookmark className="w-4 h-4" />
+                <span>Guardar este video</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {renderWorkspace()}
@@ -598,7 +636,7 @@ export default function VideoPracticer() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
+    <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">
       {/* Header Section */}
       {!videoId && (
         <div className="text-center sm:text-left">
