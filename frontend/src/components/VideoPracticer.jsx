@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Clock, Play, AlertCircle, BookOpen, Bookmark, Trash2, X, Plus, ArrowLeft, Columns, Rows } from 'lucide-react';
+import { Search, Clock, Play, AlertCircle, Bookmark, Trash2, X, ArrowLeft, Columns, Rows } from 'lucide-react';
 
 
 const YoutubeIcon = (props) => (
@@ -375,12 +375,6 @@ export default function VideoPracticer() {
       // Force instant update of active index
       updateActiveIndex(time);
     }
-  };
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Filter transcript segments based on search input

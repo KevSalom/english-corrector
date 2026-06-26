@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, Copy, Check, RotateCcw, AlertTriangle, Info, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
 import CorrectionCard from './CorrectionCard';
 

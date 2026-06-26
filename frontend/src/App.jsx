@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import CorrectorPage from './pages/CorrectorPage';
 import VideoPage from './pages/VideoPage';
