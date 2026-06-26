@@ -137,7 +137,7 @@ export default function NotesPanel({ isOpen, onClose }) {
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/60 z-50 transition-opacity duration-150 ${
+        className={`fixed inset-0 bg-black/60 z-50 transition-opacity duration-150 hidden sm:block ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
