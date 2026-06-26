@@ -277,7 +277,7 @@ export default function VideoPracticer() {
       if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
         // Compensación de latencia (300ms). La API del reproductor en iframe reporta
         // el tiempo con retraso y los subtítulos autogenerados suelen venir un poco desfasados.
-        const latencyCompensation = 0.3;
+        const latencyCompensation = 0;
         const time = playerRef.current.getCurrentTime() + latencyCompensation;
         updateActiveIndex(time);
       }
@@ -713,7 +713,7 @@ export default function VideoPracticer() {
 
       {/* Save Modal */}
       {showSaveModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className="bg-surface border border-border-custom rounded-2xl w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center py-4 px-6 border-b border-border-custom bg-surface-hover">
               <h3 className="text-text-primary font-bold flex items-center gap-2 m-0">
