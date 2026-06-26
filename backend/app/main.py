@@ -10,10 +10,9 @@ from app.schemas import (
     TranscriptResponse,
     TranscriptSegment,
     VideoSaveRequest,
-    VideoResponse,
-    NoteCreateRequest,
-    NoteResponse
+    NoteCreateRequest
 )
+from app.models import SavedVideo, Note
 from app.repository import OpenRouterRepository
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
@@ -178,7 +177,7 @@ async def health_check():
         "api_key_configured": is_key_set
     }
 
-@app.get("/api/videos", response_model=List[VideoResponse])
+@app.get("/api/videos", response_model=List[SavedVideo])
 async def get_saved_videos():
     from app.db import list_videos
     try:
@@ -190,7 +189,7 @@ async def get_saved_videos():
             detail=f"Error al listar videos guardados: {str(e)}"
         )
 
-@app.post("/api/videos", response_model=VideoResponse, status_code=status.HTTP_201_CREATED)
+@app.post("/api/videos", response_model=SavedVideo, status_code=status.HTTP_201_CREATED)
 async def save_video_link(request: VideoSaveRequest):
     from app.db import add_video
     if not request.title.strip() or not request.url.strip():
@@ -238,7 +237,7 @@ async def delete_saved_video(video_id: str):
 
 # --- Notes Endpoints ---
 
-@app.get("/api/notes", response_model=List[NoteResponse])
+@app.get("/api/notes", response_model=List[Note])
 async def get_notes():
     from app.db import list_notes
     try:
@@ -250,7 +249,7 @@ async def get_notes():
             detail=f"Error al listar las notas: {str(e)}"
         )
 
-@app.post("/api/notes", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
+@app.post("/api/notes", response_model=Note, status_code=status.HTTP_201_CREATED)
 async def create_note(request: NoteCreateRequest):
     from app.db import add_note
     if not request.content.strip():
@@ -287,7 +286,7 @@ async def delete_note_endpoint(note_id: str):
             detail=f"Error al eliminar la nota: {str(e)}"
         )
 
-@app.put("/api/notes/{note_id}", response_model=NoteResponse)
+@app.put("/api/notes/{note_id}", response_model=Note)
 async def update_note_endpoint(note_id: str, request: NoteCreateRequest):
     from app.db import update_note
     if not request.content.strip():
