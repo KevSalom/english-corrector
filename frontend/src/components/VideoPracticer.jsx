@@ -275,7 +275,7 @@ export default function VideoPracticer() {
     stopTimer();
     timerRef.current = setInterval(() => {
       if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
-        // Compensación de latencia (300ms). La API del reproductor en iframe reporta
+        // Compensación de latencia (0ms). La API del reproductor en iframe reporta
         // el tiempo con retraso y los subtítulos autogenerados suelen venir un poco desfasados.
         const latencyCompensation = 0;
         const time = playerRef.current.getCurrentTime() + latencyCompensation;
