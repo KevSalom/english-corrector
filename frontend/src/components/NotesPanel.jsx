@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Trash2, StickyNote, AlertCircle, Edit2 } from 'lucide-react';
+import { useAlert } from './AlertProvider';
 
 export default function NotesPanel({ isOpen, onClose }) {
+  const { confirm } = useAlert();
   const [notes, setNotes] = useState([]);
   const [newContent, setNewContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -64,7 +66,8 @@ export default function NotesPanel({ isOpen, onClose }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar esta nota?')) return;
+    const ok = await confirm('¿Eliminar esta nota?');
+    if (!ok) return;
     try {
       const apiBase = import.meta.env.VITE_API_URL || '';
       const response = await fetch(`${apiBase}/api/notes/${id}`, {

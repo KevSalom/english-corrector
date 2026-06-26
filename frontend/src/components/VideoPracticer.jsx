@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Clock, Play, AlertCircle, Bookmark, Trash2, X, ArrowLeft, Columns, Rows, Copy, StickyNote } from 'lucide-react';
+import { useAlert } from './AlertProvider';
 
 
 const YoutubeIcon = (props) => (
@@ -15,6 +16,7 @@ const YoutubeIcon = (props) => (
 );
 
 export default function VideoPracticer() {
+  const { alert, confirm } = useAlert();
   const [videoUrl, setVideoUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -144,7 +146,8 @@ export default function VideoPracticer() {
 
   const handleDeleteVideo = async (id, e) => {
     e.stopPropagation();
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este video guardado?')) return;
+    const ok = await confirm('¿Estás seguro de que quieres eliminar este video guardado?');
+    if (!ok) return;
 
     try {
       const apiBase = import.meta.env.VITE_API_URL || '';
@@ -155,11 +158,11 @@ export default function VideoPracticer() {
         setSavedVideos((prev) => prev.filter((v) => v.id !== id));
       } else {
         const data = await response.json();
-        alert(data.detail || 'Error al eliminar el video.');
+        await alert(data.detail || 'Error al eliminar el video.');
       }
     } catch (err) {
       console.error('Error deleting video:', err);
-      alert('Error de conexión.');
+      await alert('Error de conexión.');
     }
   };
 
@@ -409,12 +412,12 @@ export default function VideoPracticer() {
         window.dispatchEvent(new Event('notes-updated'));
         setTimeout(() => setSavingNoteIndex(-1), 1200);
       } else {
-        alert('Error al guardar la nota');
+        await alert('Error al guardar la nota');
         setSavingNoteIndex(-1);
       }
     } catch (err) {
       console.error('Error saving note:', err);
-      alert('Error de conexión al guardar la nota');
+      await alert('Error de conexión al guardar la nota');
       setSavingNoteIndex(-1);
     }
   };

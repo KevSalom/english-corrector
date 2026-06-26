@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, Copy, Check, RotateCcw, AlertTriangle, Info, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
 import CorrectionCard from './CorrectionCard';
+import { useAlert } from './AlertProvider';
 
 export default function MainCorrector({ isMini = false }) {
+  const { alert } = useAlert();
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

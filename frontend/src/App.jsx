@@ -5,6 +5,7 @@ import VideoPage from './pages/VideoPage';
 import ThemeToggle from './components/ThemeToggle';
 import NotesButton from './components/NotesButton';
 import NotesPanel from './components/NotesPanel';
+import { AlertProvider } from './components/AlertProvider';
 
 function App() {
   const [notesOpen, setNotesOpen] = useState(false);
@@ -35,8 +36,9 @@ function App() {
   };
 
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen bg-app text-text-primary transition-all duration-200">
+    <AlertProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen bg-app text-text-primary transition-all duration-200">
         
         {/* Header */}
         <header className="sticky top-0 bg-surface/90 backdrop-blur-md border-b border-border-custom z-40 transition-all duration-200">
@@ -121,7 +123,8 @@ function App() {
         <NotesPanel isOpen={notesOpen} onClose={handleNotesClose} />
       </div>
     </Router>
-  );
+  </AlertProvider>
+);
 }
 
 export default App;
